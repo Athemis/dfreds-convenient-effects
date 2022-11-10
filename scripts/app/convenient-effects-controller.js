@@ -71,7 +71,7 @@ export default class ConvenientEffectsController {
   _fetchFavorites() {
     return this._settings.favoriteEffectNames
       .map((name) => {
-        return game.dfreds.effects.all.find((effect) => effect.name == name);
+        return game.dfreds.effects._handlers[this._foundryHelpers.systemId].all.find((effect) => effect.name == name);
       })
       .filter((effect) => effect)
       .sort((a, b) => {
@@ -91,7 +91,7 @@ export default class ConvenientEffectsController {
   }
 
   _fetchUnfavoritedConditions() {
-    const effects = game.dfreds.effects;
+    const effects = game.dfreds.effects._handlers[this._foundryHelpers.systemId];
     return effects.conditions.filter(
       (effect) =>
         !this._settings.isFavoritedEffect(effect.name) && effect.isViewable
@@ -99,7 +99,7 @@ export default class ConvenientEffectsController {
   }
 
   _fetchUnfavoritedSpells() {
-    const effects = game.dfreds.effects;
+    const effects = game.dfreds.effects._handlers[this._foundryHelpers.systemId];
     return effects.spells.filter(
       (effect) =>
         !this._settings.isFavoritedEffect(effect.name) && effect.isViewable
@@ -107,7 +107,7 @@ export default class ConvenientEffectsController {
   }
 
   _fetchUnfavoritedClassFeatures() {
-    const effects = game.dfreds.effects;
+    const effects = game.dfreds.effects._handlers[this._foundryHelpers.systemId];
     return effects.classFeatures.filter(
       (effect) =>
         !this._settings.isFavoritedEffect(effect.name) && effect.isViewable
@@ -115,7 +115,7 @@ export default class ConvenientEffectsController {
   }
 
   _fetchUnfavoritedEquipment() {
-    const effects = game.dfreds.effects;
+    const effects = game.dfreds.effects._handlers[this._foundryHelpers.systemId];
     return effects.equipment.filter(
       (effect) =>
         !this._settings.isFavoritedEffect(effect.name) && effect.isViewable
@@ -123,7 +123,7 @@ export default class ConvenientEffectsController {
   }
 
   _fetchUnfavoritedOther() {
-    const effects = game.dfreds.effects;
+    const effects = game.dfreds.effects._handlers[this._foundryHelpers.systemId];
     return effects.other.filter(
       (effect) =>
         !this._settings.isFavoritedEffect(effect.name) && effect.isViewable
@@ -328,7 +328,7 @@ export default class ConvenientEffectsController {
   async onDuplicateAsCustom(effectItem) {
     const effectName = effectItem.data().effectName;
 
-    const effect = game.dfreds.effects.all.find(
+    const effect = game.dfreds.effects._handlers[this._foundryHelpers.systemId].all.find(
       (effect) => effect.name === effectName
     );
 
@@ -457,7 +457,7 @@ export default class ConvenientEffectsController {
   _isValidEffect(event) {
     try {
       const data = JSON.parse(event.dataTransfer.getData('text/plain'));
-      return game.dfreds.effects.all.some(
+      return game.dfreds.effects._handlers[this._foundryHelpers.systemId].all.some(
         (effect) => effect.name === data.effectName
       );
     } catch (err) {

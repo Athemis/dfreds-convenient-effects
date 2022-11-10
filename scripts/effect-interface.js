@@ -64,7 +64,7 @@ export default class EffectInterface {
     const effect = this.findCustomEffectByName(effectName);
     if (effect) return effect;
 
-    return game.dfreds.effects.all.find((effect) => effect.name == effectName);
+    return game.dfreds.effects._handlers[this._foundryHelpers.systemId].all.find((effect) => effect.name == effectName);
   }
 
   /**

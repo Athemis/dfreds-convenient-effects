@@ -2,7 +2,7 @@ import ChatHandler from './chat-handler.js';
 import Constants from './constants.js';
 import Controls from './controls.js';
 import CustomEffectsHandler from './effects/custom-effects-handler.js';
-import EffectDefinitions from './effects/effect-definitions.js';
+import EffectDefinitionsDelegate from './effects/effect-definitions-delegate.js';
 import EffectInterface from './effect-interface.js';
 import FoundryHelpers from './foundry-helpers.js';
 import HandlebarHelpers from './handlebar-helpers.js';
@@ -25,7 +25,7 @@ Hooks.once('init', () => {
 Hooks.once('socketlib.ready', () => {
   game.dfreds = game.dfreds || {};
 
-  game.dfreds.effects = new EffectDefinitions();
+  game.dfreds.effects = new EffectDefinitionsDelegate();
   game.dfreds.effectInterface = new EffectInterface();
   game.dfreds.statusEffects = new StatusEffects();
 
