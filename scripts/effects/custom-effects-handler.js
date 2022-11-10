@@ -295,10 +295,15 @@ export default class CustomEffectsHandler {
   }
 
   async _createCustomEffectsItem() {
+    let itemType = 'consumable';
+    if (game.system.id == 'ds4') {
+      itemType = 'equipment';
+    }
+      
     const item = await CONFIG.Item.documentClass.create({
       name: 'Custom Convenient Effects',
       img: 'modules/dfreds-convenient-effects/images/magic-palm.svg',
-      type: 'consumable',
+      type: itemType,
     });
 
     log(`Creating custom item with ${item.id}`);
