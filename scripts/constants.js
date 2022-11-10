@@ -24,5 +24,6 @@ export default class Constants {
 
   static SYSTEM_IDS = {
     DND_5E: 'dnd5e',
+    DS4: 'ds4',
   };
 }
