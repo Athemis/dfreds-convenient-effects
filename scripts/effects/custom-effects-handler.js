@@ -296,7 +296,7 @@ export default class CustomEffectsHandler {
 
   async _createCustomEffectsItem() {
     let itemType = 'consumable';
-    if (game.system.id == 'ds4') {
+    if (this._foundryHelpers.systemId == 'ds4') {
       itemType = 'equipment';
     }
       

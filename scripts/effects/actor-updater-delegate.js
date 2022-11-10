@@ -1,6 +1,7 @@
 import Constants from '../constants.js';
 import FoundryHelpers from '../foundry-helpers.js';
 import ActorUpdater5e from './dnd5e/actor-updater-5e.js';
+import ActorUpdaterDS4 from './ds4/actor-updater-ds4.js';
 
 /**
  * Handles updating actor data for certain effects by delegating to specific systems
@@ -14,6 +15,7 @@ export default class ActorUpdaterDelegate {
 
   _initializeHandlers() {
     this._handlers[Constants.SYSTEM_IDS.DND_5E] = new ActorUpdater5e();
+    this._handlers[Constants.SYSTEM_IDS.DS4] = new ActorUpdaterDS4();
   }
 
   /**
