@@ -2,7 +2,7 @@ import ActorUpdaterDelegate from './effects/actor-updater-delegate.js';
 import Constants from './constants.js';
 import CustomEffectsHandler from './effects/custom-effects-handler.js';
 import Effect from './effects/effect.js';
-import EffectHandler from './effects/effect-handler.js';
+import EffectHandlerDelegate from './effects/effect-handler-delegate.js';
 import FoundryHelpers from './foundry-helpers.js';
 import Settings from './settings.js';
 
@@ -13,7 +13,7 @@ export default class EffectInterface {
   constructor() {
     this._actorUpdaterDelegate = new ActorUpdaterDelegate();
     this._customEffectsHandler = new CustomEffectsHandler();
-    this._effectHandler = new EffectHandler();
+    this._effectHandlerDelegate = new EffectHandlerDelegate();
     this._foundryHelpers = new FoundryHelpers();
     this._settings = new Settings();
   }
@@ -29,15 +29,15 @@ export default class EffectInterface {
   _registerFunctions() {
     this._socket.register(
       'toggleEffect',
-      this._effectHandler.toggleEffect.bind(this._effectHandler)
+      this._effectHandlerDelegate.toggleEffect.bind(this._effectHandlerDelegate)
     );
     this._socket.register(
       'addEffect',
-      this._effectHandler.addEffect.bind(this._effectHandler)
+      this._effectHandlerDelegate.addEffect.bind(this._effectHandler)
     );
     this._socket.register(
       'removeEffect',
-      this._effectHandler.removeEffect.bind(this._effectHandler)
+      this._effectHandlerDelegate.removeEffect.bind(this._effectHandler)
     );
     this._socket.register(
       'addActorDataChanges',
@@ -64,7 +64,7 @@ export default class EffectInterface {
     const effect = this.findCustomEffectByName(effectName);
     if (effect) return effect;
 
-    return game.dfreds.effects.all.find((effect) => effect.name == effectName);
+    return game.dfreds.effects._handlers[this._foundryHelpers.systemId].all.find((effect) => effect.name == effectName);
   }
 
   /**
@@ -136,7 +136,7 @@ export default class EffectInterface {
    * @returns {boolean} true if the effect is applied, false otherwise
    */
   hasEffectApplied(effectName, uuid) {
-    return this._effectHandler.hasEffectApplied(effectName, uuid);
+    return this._effectHandlerDelegate.hasEffectApplied(effectName, uuid);
   }
 
   /**

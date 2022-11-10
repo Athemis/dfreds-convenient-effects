@@ -1,4 +1,5 @@
 import CustomEffectsHandler from './effects/custom-effects-handler.js';
+import FoundryHelpers from './foundry-helpers.js';
 import Settings from './settings.js';
 
 /**
@@ -7,6 +8,7 @@ import Settings from './settings.js';
 export default class StatusEffects {
   constructor() {
     this._customEffectsHandler = new CustomEffectsHandler();
+    this._foundryHelpers = new FoundryHelpers();
     this._settings = new Settings();
   }
 
@@ -36,7 +38,7 @@ export default class StatusEffects {
 
         if (effect) return effect;
 
-        return game.dfreds.effects.all.find((effect) => effect.name == name);
+        return game.dfreds.effects._handlers[this._foundryHelpers.systemId].all.find((effect) => effect.name == name);
       })
       .filter((effect) => effect)
       .map((effect) => effect.convertToActiveEffectData());

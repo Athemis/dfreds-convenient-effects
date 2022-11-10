@@ -1,7 +1,13 @@
+import FoundryHelpers from './foundry-helpers.js';
+
 /**
  * Handles creating macros
  */
 export default class MacroHandler {
+  constructor() {
+    this._foundryHelpers = new FoundryHelpers();
+  }
+  
   /**
    * Create a Macro from a Convenient Effect drop.
    * Get an existing item macro if one exists, otherwise create a new one.
@@ -12,7 +18,7 @@ export default class MacroHandler {
   async createMacro(data, slot) {
     if (!data.effectName) return;
 
-    const effect = game.dfreds.effects.all.find(
+    const effect = game.dfreds.effects._handlers[this._foundryHelpers.systemId].all.find(
       (effect) => effect.name === data.effectName
     );
 
