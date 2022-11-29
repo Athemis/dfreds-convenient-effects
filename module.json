@@ -28,12 +28,6 @@
   "languages": [],
   "system": ["dnd5e", "sw5e", "ds4"],
   "relationships": {
-    "systems": [
-      {
-        "id": "dnd5e",
-        "type": "system"
-      }
-    ],
     "requires": [
       {
         "id": "socketlib",
