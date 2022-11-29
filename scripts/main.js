@@ -42,7 +42,7 @@ Hooks.once('ready', async () => {
   await customEffectsHandler.deleteInvalidEffects();
   game.dfreds.statusEffects.initializeStatusEffects();
 
-  Hooks.callAll('dfreds-convenient-effects.ready');
+  Hooks.callAll(`${Constants.MODULE_ID}.ready`);
 });
 
 /**
@@ -108,14 +108,14 @@ Hooks.on('getSceneControlButtons', (controls) => {
  */
 Hooks.on('preCreateActiveEffect', (activeEffect, _config, _userId) => {
   if (
-    !activeEffect?.data?.flags?.isConvenient ||
+    !activeEffect?.flags?.isConvenient ||
     !(activeEffect?.parent instanceof Actor)
   )
     return;
 
   const chatHandler = new ChatHandler();
   chatHandler.createChatForEffect({
-    effectName: activeEffect?.data?.label,
+    effectName: activeEffect?.label,
     reason: 'Applied to',
     actor: activeEffect?.parent,
     isCreateActiveEffect: true,
@@ -127,15 +127,16 @@ Hooks.on('preCreateActiveEffect', (activeEffect, _config, _userId) => {
  */
 Hooks.on('createActiveEffect', (activeEffect, _config, _userId) => {
   if (
-    !activeEffect?.data?.flags?.isConvenient ||
+    !activeEffect?.flags?.isConvenient ||
     !(activeEffect?.parent instanceof Actor)
   )
     return;
 
-  if (activeEffect?.data?.flags?.requiresActorUpdate) {
+  if (activeEffect?.flags?.requiresActorUpdate) {
     game.dfreds.effectInterface.addActorDataChanges(
-      activeEffect?.data?.label,
-      activeEffect?.parent?.uuid
+      activeEffect?.label,
+      activeEffect?.parent?.uuid,
+      activeEffect?.origin
     );
   }
 });
@@ -145,7 +146,7 @@ Hooks.on('createActiveEffect', (activeEffect, _config, _userId) => {
  */
 Hooks.on('preDeleteActiveEffect', (activeEffect, _config, _userId) => {
   if (
-    !activeEffect?.data?.flags?.isConvenient ||
+    !activeEffect?.flags?.isConvenient ||
     !(activeEffect?.parent instanceof Actor)
   )
     return;
@@ -156,7 +157,7 @@ Hooks.on('preDeleteActiveEffect', (activeEffect, _config, _userId) => {
 
   const chatHandler = new ChatHandler();
   chatHandler.createChatForEffect({
-    effectName: activeEffect?.data?.label,
+    effectName: activeEffect?.label,
     reason: isExpired ? 'Expired from' : 'Removed from',
     actor: activeEffect?.parent,
     isCreateActiveEffect: false,
@@ -168,14 +169,14 @@ Hooks.on('preDeleteActiveEffect', (activeEffect, _config, _userId) => {
  */
 Hooks.on('deleteActiveEffect', (activeEffect, _config, _userId) => {
   if (
-    !activeEffect?.data?.flags?.isConvenient ||
+    !activeEffect?.flags?.isConvenient ||
     !(activeEffect?.parent instanceof Actor)
   )
     return;
 
-  if (activeEffect?.data?.flags?.requiresActorUpdate) {
+  if (activeEffect?.flags?.requiresActorUpdate) {
     game.dfreds.effectInterface.removeActorDataChanges(
-      activeEffect?.data?.label,
+      activeEffect?.label,
       activeEffect?.parent?.uuid
     );
   }
@@ -185,14 +186,14 @@ Hooks.on('deleteActiveEffect', (activeEffect, _config, _userId) => {
  * Handle adding a form item for effect description to custom effects
  */
 Hooks.on('renderActiveEffectConfig', (activeEffectConfig, html, _data) => {
-  if (!activeEffectConfig?.object?.data?.flags?.isCustomConvenient) return;
+  if (!activeEffectConfig?.object?.flags?.isCustomConvenient) return;
 
   const labelFormGroup = html
     .find('section[data-tab="details"] .form-group')
     .first();
 
   const description =
-    activeEffectConfig.object.data.flags.convenientDescription ??
+    activeEffectConfig.object.flags.convenientDescription ??
     'Applies custom effects';
   labelFormGroup.after(
     `<div class="form-group"><label>Effect Description</label><div class="form-fields"><input type="text" name="flags.convenientDescription" value="${description}"></div></div>`
@@ -203,7 +204,7 @@ Hooks.on('renderActiveEffectConfig', (activeEffectConfig, html, _data) => {
  * Handle re-rendering the ConvenientEffectsApp if it is open and a custom convenient active effect sheet is closed
  */
 Hooks.on('closeActiveEffectConfig', (activeEffectConfig, _html) => {
-  if (!activeEffectConfig?.object?.data?.flags?.isCustomConvenient) return;
+  if (!activeEffectConfig?.object?.flags?.isCustomConvenient) return;
 
   const foundryHelpers = new FoundryHelpers();
   foundryHelpers.renderConvenientEffectsAppIfOpen();

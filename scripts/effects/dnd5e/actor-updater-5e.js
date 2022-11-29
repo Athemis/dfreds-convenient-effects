@@ -13,8 +13,9 @@ export default class ActorUpdater5e {
    *
    * @param {string} effectName - the name of the effect that is adding actor data changes
    * @param {string} uuid - the UUID of the actor to add the data changes to
+   * @param {string} origin - the origin of the effect
    */
-  async addActorDataChanges(effectName, uuid) {
+  async addActorDataChanges(effectName, uuid, origin) {
     const actor = this._foundryHelpers.getActorByUuid(uuid);
 
     switch (effectName.toLowerCase()) {
@@ -33,13 +34,19 @@ export default class ActorUpdater5e {
       case "heroes' feast":
         await this._addHeroesFeastEffects(actor);
         break;
+      case 'invisibility':
+        await this._addInvisibileEffect(uuid, origin);
+        break;
+      case 'greater invisibility':
+        await this._addInvisibileEffect(uuid, origin);
+        break;
     }
   }
 
   async _addAidEffects(actor) {
     await actor.update({
-      'data.attributes.hp.tempmax': actor.data.data.attributes.hp.tempmax + 5,
-      'data.attributes.hp.value': actor.data.data.attributes.hp.value + 5,
+      'system.attributes.hp.tempmax': actor.system.attributes.hp.tempmax + 5,
+      'system.attributes.hp.value': actor.system.attributes.hp.value + 5,
     });
   }
 
@@ -48,14 +55,14 @@ export default class ActorUpdater5e {
     const evaluation = await roll.evaluate({ async: true });
 
     await actor.update({
-      'data.attributes.hp.temp': evaluation.total,
+      'system.attributes.hp.temp': evaluation.total,
     });
   }
 
   async _addDivineWordEffects(actor) {
-    if (actor.data.data.attributes.hp.value <= 20) {
+    if (actor.system.attributes.hp.value <= 20) {
       await actor.update({
-        'data.attributes.hp.value': 0,
+        'system.attributes.hp.value': 0,
       });
     }
   }
@@ -65,7 +72,7 @@ export default class ActorUpdater5e {
     const evaluation = await roll.evaluate({ async: true });
 
     await actor.update({
-      'data.attributes.hp.temp': evaluation.total,
+      'system.attributes.hp.temp': evaluation.total,
     });
   }
 
@@ -74,15 +81,23 @@ export default class ActorUpdater5e {
     const evaluation = await roll.evaluate({ async: true });
 
     await actor.update({
-      'data.attributes.hp.tempmax':
-        actor.data.data.attributes.hp.tempmax + evaluation.total,
-      'data.attributes.hp.value':
-        actor.data.data.attributes.hp.value + evaluation.total,
+      'system.attributes.hp.tempmax':
+        actor.system.attributes.hp.tempmax + evaluation.total,
+      'system.attributes.hp.value':
+        actor.system.attributes.hp.value + evaluation.total,
       flags: {
         convenientEffects: {
           heroesFeastRoll: evaluation.total,
         },
       },
+    });
+  }
+
+  async _addInvisibileEffect(uuid, origin) {
+    await game.dfreds.effectInterface.addEffect({
+      effectName: 'Invisible',
+      uuid,
+      origin,
     });
   }
 
@@ -108,52 +123,66 @@ export default class ActorUpdater5e {
       case "heroes' feast":
         await this._removeHeroesFeastEffects(actor);
         break;
+      case 'invisibility':
+        await this._removeInvisibleEffect(uuid, origin);
+        break;
+      case 'greater invisibility':
+        await this._removeInvisibleEffect(uuid, origin);
+        break;
     }
   }
 
   async _removeAidEffects(actor) {
-    const newTempMax = actor.data.data.attributes.hp.tempmax - 5;
-    const value = actor.data.data.attributes.hp.value;
-    const max = actor.data.data.attributes.hp.max;
+    const newTempMax = actor.system.attributes.hp.tempmax - 5;
+    const value = actor.system.attributes.hp.value;
+    const max = actor.system.attributes.hp.max;
 
     await actor.update({
-      'data.attributes.hp.tempmax': newTempMax,
+      'system.attributes.hp.tempmax': newTempMax,
     });
 
     if (value > max + newTempMax) {
       await actor.update({
-        'data.attributes.hp.value': max + newTempMax,
+        'system.attributes.hp.value': max + newTempMax,
       });
     }
   }
 
   async _removeBearsEnduranceEffects(actor) {
     await actor.update({
-      'data.attributes.hp.temp': 0,
+      'system.attributes.hp.temp': 0,
     });
   }
 
   async _removeFalseLifeEffects(actor) {
     await actor.update({
-      'data.attributes.hp.temp': 0,
+      'system.attributes.hp.temp': 0,
     });
   }
 
   async _removeHeroesFeastEffects(actor) {
-    const total = actor.data.flags.convenientEffects.heroesFeastRoll;
+    const total = actor.flags.convenientEffects.heroesFeastRoll;
 
-    const newTempMax = actor.data.data.attributes.hp.tempmax - total;
-    const value = actor.data.data.attributes.hp.value;
-    const max = actor.data.data.attributes.hp.max;
+    const newTempMax = actor.system.attributes.hp.tempmax - total;
+    const value = actor.system.attributes.hp.value;
+    const max = actor.system.attributes.hp.max;
 
     await actor.update({
-      'data.attributes.hp.tempmax': newTempMax,
+      'system.attributes.hp.tempmax': newTempMax,
     });
 
     if (value > max + newTempMax) {
       await actor.update({
-        'data.attributes.hp.value': max + newTempMax,
+        'system.attributes.hp.value': max + newTempMax,
       });
     }
+  }
+
+  async _removeInvisibleEffect(uuid, origin) {
+    await game.dfreds.effectInterface.removeEffect({
+      effectName: 'Invisible',
+      uuid,
+      origin,
+    });
   }
 }

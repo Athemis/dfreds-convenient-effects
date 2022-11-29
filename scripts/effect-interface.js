@@ -145,9 +145,11 @@ export default class EffectInterface {
    * @param {object} params - the effect params
    * @param {string} params.effectName - the name of the effect to remove
    * @param {string} params.uuid - the UUID of the actor to remove the effect from
+   * @param {string | undefined} params.origin - only removes the effect if the origin 
+   * matches. If undefined, removes any effect with the matching name
    * @returns {Promise} a promise that resolves when the GM socket function completes
    */
-  async removeEffect({ effectName, uuid }) {
+  async removeEffect({ effectName, uuid, origin }) {
     let effect = this.findEffectByName(effectName);
 
     if (!effect) {
@@ -169,6 +171,7 @@ export default class EffectInterface {
     return this._socket.executeAsGM('removeEffect', {
       effectName: effect.name,
       uuid,
+      origin,
     });
   }
 
@@ -231,15 +234,26 @@ export default class EffectInterface {
     }
 
     if (effect.nestedEffects.length > 0) {
-      effect = await this._getNestedEffectSelection(effect);
-    }
+      let nestedEffect = await this._getNestedEffectSelection(effect);
+      let newEffectData = mergeObject(
+        effectData,
+        nestedEffect.convertToObject()
+      );
 
-    return this._socket.executeAsGM('addEffect', {
-      effectData,
-      uuid,
-      origin,
-      overlay,
-    });
+      return this._socket.executeAsGM('addEffect', {
+        effectData: newEffectData,
+        uuid,
+        origin,
+        overlay,
+      });
+    } else {
+      return this._socket.executeAsGM('addEffect', {
+        effectData,
+        uuid,
+        origin,
+        overlay,
+      });
+    }
   }
 
   /**
@@ -260,10 +274,16 @@ export default class EffectInterface {
    *
    * @param {string} effectName - the name of the effect that is adding actor data changes
    * @param {string} uuid - the UUID of the actor to add the data changes to
+   * @param {string} origin - the origin of the effect
    * @returns {Promise} a promise that resolves when the GM socket function completes
    */
-  addActorDataChanges(effectName, uuid) {
-    return this._socket.executeAsGM('addActorDataChanges', effectName, uuid);
+  addActorDataChanges(effectName, uuid, origin) {
+    return this._socket.executeAsGM(
+      'addActorDataChanges',
+      effectName,
+      uuid,
+      origin
+    );
   }
 
   /**
